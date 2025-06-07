@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  name            String?
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  projects        Project[]
+  assignedTasks   TaskAssignment[]
+  comments        Comment[]
+  projectMembers  ProjectMember[]
+}
+
+model Project {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  createdBy       User              @relation(fields: [createdById], references: [id])
+  createdById     Int
+  tasks           Task[]
+  members         ProjectMember[]
+}
+
+model ProjectMember {
+  id              Int               @id @default(autoincrement())
+  role            Role              @default(MEMBER)
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId       Int
+  user            User              @relation(fields: [userId], references: [id])
+  userId          Int
+  joinedAt        DateTime          @default(now())
+
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?
+  status          TaskStatus        @default(TODO)
+  priority        Priority          @default(MEDIUM)
+  dueDate         DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId       Int
+  parent          Task?             @relation("TaskToSubtask", fields: [parentId], references: [id])
+  parentId        Int?
+  subtasks        Task[]            @relation("TaskToSubtask")
+  assignments     TaskAssignment[]
+  comments        Comment[]
+  labels          LabelOnTask[]
+  attachments     Attachment[]
+}
+
+model TaskAssignment {
+  id              Int               @id @default(autoincrement())
+  task            Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId          Int
+  assignee        User              @relation(fields: [assigneeId], references: [id])
+  assigneeId      Int
+  assignedAt      DateTime          @default(now())
+
+  @@unique([taskId, assigneeId])
+}
+
+model Comment {
+  id              Int               @id @default(autoincrement())
+  content         String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  task            Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId          Int
+  author          User              @relation(fields: [authorId], references: [id])
+  authorId        Int
+}
+
+model Label {
+  id              Int               @id @default(autoincrement())
+  name            String
+  color           String            @default("#808080")
+  tasks           LabelOnTask[]
+}
+
+model LabelOnTask {
+  label           Label             @relation(fields: [labelId], references: [id], onDelete: Cascade)
+  labelId         Int
+  task            Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId          Int
+
+  @@id([labelId, taskId])
+}
+
+model Attachment {
+  id              Int               @id @default(autoincrement())
+  name            String
+  path            String
+  mimeType        String
+  size            Int
+  uploadedAt      DateTime          @default(now())
+  task            Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId          Int
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+  ARCHIVED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
