@@ -91,6 +91,7 @@ export function AppSidebar() {
             </Avatar>
           </div>
           <SearchInput
+            shortCutKey="/"
             placeholder="Search anything"
             className="bg-white"
             containerClassName="mt-2"

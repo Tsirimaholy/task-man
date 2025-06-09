@@ -5,11 +5,13 @@ import { Input } from "./input";
 
 interface SearchInputProps extends Omit<React.ComponentProps<"input">, "type"> {
   containerClassName?: string;
+  shortCutKey?: string;
 }
 
 export default function SearchInput({
   className,
-  containerClassName="",
+  containerClassName = "",
+  shortCutKey,
   ...props
 }: SearchInputProps) {
   const ref = useRef<HTMLInputElement>(null);
@@ -19,13 +21,18 @@ export default function SearchInput({
         ref.current?.focus();
       }
     };
-    window.addEventListener("keydown", listener);
+
+    if (shortCutKey) {
+      window.addEventListener("keydown", listener);
+    }
     () => {
-      window.removeEventListener("keydown", listener);
+      if (shortCutKey) window.removeEventListener("keydown", listener);
     };
   }, []);
   return (
-    <div className={cn("text-muted-foreground relative w-fit", containerClassName)}>
+    <div
+      className={cn("text-muted-foreground relative w-fit", containerClassName)}
+    >
       <Input
         ref={ref}
         type="search"
