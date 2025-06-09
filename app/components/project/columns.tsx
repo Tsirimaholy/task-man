@@ -16,10 +16,6 @@ import { Button } from "../ui/button";
 
 export const columns: ColumnDef<Project>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
@@ -28,7 +24,7 @@ export const columns: ColumnDef<Project>[] = [
         <NavLink
           className="text-wrap"
           to={href("/projects/:projectId/tasks", {
-            projectId: row.getValue("id"),
+            projectId: row.original.id.toString(),
           })}
         >
           {row.getValue("name")}
