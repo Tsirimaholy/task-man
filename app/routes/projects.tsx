@@ -4,8 +4,11 @@ import { DataTable } from "~/components/project/data-table";
 import { columns } from "~/components/project/columns";
 import SearchInput from "~/components/ui/SearchInput";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { Paragraph } from "~/components/typography";
 
-export const loader = async ({ }: Route.LoaderArgs) => {
+export const loader = async ({}: Route.LoaderArgs) => {
   const projects = await prisma.project.findMany();
   return { projects };
 };
@@ -19,13 +22,21 @@ export default function Projects({ loaderData }: Route.ComponentProps) {
   );
 
   return (
-    <div className="mt-2">
-      <div className="flex mb-2 justify-end">
-        <div className="content-end items-center">
-          <SearchInput
-            className="w-auto"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="mt-8">
+      <div className="flex mb-3 items-center justify-between gap-3">
+        <Paragraph textColorClassName="text-muted-foreground">Manage your created projects</Paragraph>
+        <div className="flex gap-3">
+          <div className="content-end items-center">
+            <SearchInput
+              placeholder="Search projects"
+              className="w-auto"
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button>
+            <PlusCircle />
+            Create project
+          </Button>
         </div>
       </div>
       <DataTable columns={columns} data={filteredProjects} />
