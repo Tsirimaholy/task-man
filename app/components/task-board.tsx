@@ -1,12 +1,12 @@
+import type { TaskStatus } from "generated/prisma/client";
 import { LucidePlus, MoreHorizontal, PlusIcon } from "lucide-react";
-import TaskCard from "./task-card";
 import React, { useState } from "react";
-import EmptyTaskCard from "./empty-task-card";
-import BoardStatusIcon from "./board-status-icon";
 import { useSubmit } from "react-router";
-import { Button } from "./ui/button";
+import BoardStatusIcon from "./board-status-icon";
+import EmptyTaskCard from "./empty-task-card";
+import TaskCard from "./task-card";
 import { Badge } from "./ui/badge";
-import { Paragraph } from "./typography";
+import { Button } from "./ui/button";
 
 export type TAssignee = {
   id: number;
@@ -48,7 +48,7 @@ type TaskBoardProps = {
   tasks: ITask[];
   onTaskAction?: (taskData: any, intent: string) => void;
   isLoading?: boolean;
-  status: string;
+  status: TaskStatus;
 };
 
 export default function TaskBoard({
@@ -172,6 +172,7 @@ export default function TaskBoard({
         )} */}
         {isCreating && (
           <EmptyTaskCard
+            status={status}
             onSave={validateFields}
             onCancel={handleCancelNewTask}
           />

@@ -1,16 +1,19 @@
-import { useState } from "react";
-import { Card, CardTitle } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { Input } from "./ui/input";
+import type { TaskStatus } from "generated/prisma/client";
 import { Circle } from "lucide-react";
+import { useState } from "react";
 import { useSubmit } from "react-router";
+import { Card, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 
 interface EmptyTaskCardProps {
+  status: TaskStatus
   onSave: (title: string, description: string) => void;
   onCancel: () => void;
 }
 
 export default function EmptyTaskCard({
+  status,
   onCancel,
   onSave,
 }: EmptyTaskCardProps) {
@@ -22,7 +25,7 @@ export default function EmptyTaskCard({
     formData.append("intent", "create");
     formData.append("title", title);
     formData.append("description", description || "");
-    formData.append("status", "TODO");
+    formData.append("status", status);
     submit(formData, { method: "POST" });
     onSave(title, description);
   };
