@@ -2,23 +2,13 @@ import { type Route } from ".react-router/types/app/routes/+types/projects";
 
 import {
   Calendar,
-  Home,
-  Inbox,
-  Search,
   Settings,
-  LucideListTodo,
   UserIcon,
   ChevronsUpDown,
-  ListCheck,
   LucideHelpingHand,
   ArrowUpRight,
   Layers,
-  ListTodo,
-  Plus,
-  ChevronDownIcon,
-  ChevronDown,
   FolderKanban,
-  ListTodoIcon,
 } from "lucide-react";
 
 import {
@@ -26,40 +16,24 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import {
-  href,
-  NavLink,
-  useLoaderData,
-  useLocation,
-  useRouteLoaderData,
-} from "react-router";
-import { H6, Paragraph } from "./typography";
+import { href, NavLink, useLoaderData, useLocation } from "react-router";
+import { H6 } from "./typography";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import SearchInput from "./ui/SearchInput";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./ui/collapsible";
 
-// Menu items.
 const items = [
-  {
-    title: "Home",
-    url: href("/"),
-    icon: Home,
-  },
+  // {
+  //   title: "Home",
+  //   url: href("/"),
+  //   icon: Home,
+  // },
   // {
   //   title: "Task",
   //   url: href("/projects/:projectId/tasks", { projectId: "1" }),
@@ -67,8 +41,8 @@ const items = [
   // },
   {
     title: "Projects",
-    url: href("/projects"),
-    icon: ListCheck,
+    url: href("/"),
+    icon: FolderKanban,
   },
   {
     title: "Schedule",
@@ -139,23 +113,24 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+            {/*
             <SidebarMenu>
               <Collapsible defaultOpen className="group/collapsible">
                 <SidebarMenuItem>
                   <SidebarMenuItem>
-                    <CollapsibleTrigger>
+                    <CollapsibleTrigger className="w-full">
                       <SidebarMenuButton>
                         <FolderKanban />
-                        Projects
+                        <span>Projects</span>
                         <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                   </SidebarMenuItem>
-                  <CollapsibleContent>
+                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {projects?.map((project) => {
                         return (
-                          <SidebarMenuSubItem>
+                          <SidebarMenuSubItem key={project.id}>
                             <SidebarMenuButton
                               asChild
                               isActive={
@@ -169,7 +144,6 @@ export function AppSidebar() {
                                   projectId: project.id.toString(),
                                 })}
                               >
-                                <ListTodoIcon />
                                 <span>{project.name}</span>{" "}
                               </NavLink>
                             </SidebarMenuButton>
@@ -181,6 +155,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </Collapsible>
             </SidebarMenu>
+            */}
           </SidebarGroupContent>
           <SidebarGroup>
             <SidebarGroupContent></SidebarGroupContent>

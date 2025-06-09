@@ -266,7 +266,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
   return (
     <div className="h-full flex flex-col overflow-scroll">
       {/* Action */}
-      <div className="mb-1 border-t border-b py-2 flex justify-between">
+      <nav className="mb-1 border-b py-2 flex justify-between">
         <div className="flex gap-2">
           <Button variant={"secondary"} className="text-xs" size={"sm"}>
             <Settings2 /> Filter
@@ -309,7 +309,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
             Request task
           </Button>
         </div>
-      </div>
+      </nav>
       {/* @ts-ignore */}
       {fetcher.data?.error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">

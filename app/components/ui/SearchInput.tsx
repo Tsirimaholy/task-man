@@ -25,7 +25,7 @@ export default function SearchInput({
     };
   }, []);
   return (
-    <div className={cn("text-muted-foreground relative", containerClassName)}>
+    <div className={cn("text-muted-foreground relative w-fit", containerClassName)}>
       <Input
         ref={ref}
         type="search"

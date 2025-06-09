@@ -1,6 +1,7 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import type { Project } from "generated/prisma/client";
 import { href, NavLink } from "react-router";
+import { Button } from "../ui/button";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -23,6 +24,7 @@ export const columns: ColumnDef<Project>[] = [
     header: "Name",
     cell: ({ row }) => {
       return (
+        <Button asChild variant={"link"}>
         <NavLink
           className="text-wrap"
           to={href("/projects/:projectId/tasks", {
@@ -31,6 +33,7 @@ export const columns: ColumnDef<Project>[] = [
         >
           {row.getValue("name")}
         </NavLink>
+        </Button>
       );
     },
   },
@@ -54,9 +57,5 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "updatedAt",
     header: "Updated At",
     cell: ({ row }) => row.original.updatedAt.toLocaleString(),
-  },
-  {
-    accessorKey: "createdById",
-    header: "Created By ID",
   },
 ];

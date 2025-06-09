@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
 import { Outlet, useLocation, useRouteLoaderData } from "react-router";
 import { Paragraph } from "~/components/typography";
-import { Link2Icon, Sparkle } from "lucide-react";
+import { ChevronRight, Link2Icon, Sparkle } from "lucide-react";
 import { type Route } from ".react-router/types/app/routes/+types/tasks";
 import { AvatarFallback, AvatarImage, Avatar } from "~/components/ui/avatar";
 import { extractInitial } from "~/lib/utils";
@@ -17,7 +17,7 @@ export function meta({}) {
 }
 function PageHeaderTitle() {
   const location = useLocation();
-  const title = location.pathname.split("/").at(-1);
+  const title = location.pathname.split("/").at(-1) || "Projects";
   return (
     <div className="flex items-center">
       {title === "tasks" ? <Sparkle size={17} /> : ""}
@@ -30,18 +30,21 @@ export const loader = async () => {
   return { projects };
 };
 export default function Home() {
-  const data =
+  // Fetch data for active project
+  const activeProjectData =
     useRouteLoaderData<Route.ComponentProps["loaderData"]>("routes/tasks");
 
   return (
     <SidebarProvider className="overflow-hidden ">
       <AppSidebar />
       <main className="px-5 pb-10 flex flex-col h-svh w-full overflow-hidden">
-        <header className="">
+        <header className="border-b">
           <nav className="flex items-center justify-between p-2">
-            <div className="flex">
+            <div className="flex items-center">
               <SidebarTrigger className="cursor-pointer mr-2" />
-              <PageHeaderTitle />
+              <PageHeaderTitle />{" "}
+              <ChevronRight className="text-muted-foreground" size={20} />
+              <Paragraph>{activeProjectData?.project?.name}</Paragraph>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
@@ -53,7 +56,7 @@ export default function Home() {
                   Last updated x days ago
                 </Paragraph>
                 <div className="flex -space-x-2">
-                  {data?.project?.members.map((member) => {
+                  {activeProjectData?.project?.members.map((member) => {
                     const img = ["/avatar.png", "/avatar2.png"];
                     const idx = Math.floor(Math.random() * 2);
                     return (
