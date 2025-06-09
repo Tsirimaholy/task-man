@@ -26,19 +26,9 @@ import {
 import { href, NavLink, useLoaderData, useLocation } from "react-router";
 import { H6 } from "./typography";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
-import SearchInput from "./ui/SearchInput";
+import SearchInput from "~/components/ui/search-input";
 
 const items = [
-  // {
-  //   title: "Home",
-  //   url: href("/"),
-  //   icon: Home,
-  // },
-  // {
-  //   title: "Task",
-  //   url: href("/projects/:projectId/tasks", { projectId: "1" }),
-  //   icon: LucideListTodo,
-  // },
   {
     title: "Projects",
     url: href("/"),

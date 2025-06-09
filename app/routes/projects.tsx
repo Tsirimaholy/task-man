@@ -2,7 +2,7 @@ import prisma from "~/lib/prisma";
 import type { Route } from "./+types/projects";
 import { DataTable } from "~/components/project/data-table";
 import { columns } from "~/components/project/columns";
-import SearchInput from "~/components/ui/SearchInput";
+import SearchInput from "~/components/ui/search-input";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { PlusCircle } from "lucide-react";
