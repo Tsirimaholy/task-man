@@ -18,6 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "~/components/ui/select";
+import { delay } from "~/lib/timing";
 
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -77,8 +78,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     return reactRouter.data({ task, success: true });
   }
   if (intent === "update") {
-    // delay
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await delay(3000);
     const taskId = parseInt(formData.get("taskId") as string);
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
