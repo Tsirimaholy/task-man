@@ -48,33 +48,37 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <Paragraph
-                  as={"span"}
-                  className="text-xs"
-                  textColorClassName="text-muted-foreground"
-                >
-                  Last updated x days ago
-                </Paragraph>
-                <div className="flex -space-x-2">
-                  {activeProjectData?.project?.members.map((member) => {
-                    const img = ["/avatar.png", "/avatar2.png"];
-                    const idx = Math.floor(Math.random() * 2);
-                    return (
-                      <Avatar key={member.id}>
-                        <AvatarImage
-                          src={img[idx]}
-                          className="border-2 border-white"
-                        ></AvatarImage>
-                        <AvatarFallback>
-                          {member?.user &&
-                            extractInitial(
-                              member.user.name || member.user.email
-                            )}
-                        </AvatarFallback>
-                      </Avatar>
-                    );
-                  })}
-                </div>
+                {activeProjectData?.project ? (
+                  <>
+                    <Paragraph
+                      as={"span"}
+                      className="text-xs"
+                      textColorClassName="text-muted-foreground"
+                    >
+                      Last updated x days ago
+                    </Paragraph>
+                    <div className="flex -space-x-2">
+                      {activeProjectData.project?.members.map((member) => {
+                        const img = ["/avatar.png", "/avatar2.png"];
+                        const idx = Math.floor(Math.random() * 2);
+                        return (
+                          <Avatar key={member.id}>
+                            <AvatarImage
+                              src={img[idx]}
+                              className="border-2 border-white"
+                            ></AvatarImage>
+                            <AvatarFallback>
+                              {member?.user &&
+                                extractInitial(
+                                  member.user.name || member.user.email
+                                )}
+                            </AvatarFallback>
+                          </Avatar>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : null}
               </div>
               <Button
                 variant={"secondary"}
