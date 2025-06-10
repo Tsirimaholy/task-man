@@ -12,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import proseStyles from "./styles/prose.css?url";
 import { logout } from "./lib/auth";
+import { authCookieStorage } from "./lib/session";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -38,6 +39,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
   throw data({ message: "unsuported intent" }, { status: 405 });
 };
+
+export async function loader({ request }: Route.ActionArgs) {
+  const session = await authCookieStorage.getSession(
+    request.headers.get("cookie")
+  );
+  const user = session.get("user");
+  return { user };
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
