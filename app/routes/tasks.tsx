@@ -1,26 +1,28 @@
-import * as reactRouter from "react-router";
-import prisma from "~/lib/prisma";
-import type { Route } from "./+types/tasks";
-import TaskBoard from "~/components/task-board";
 import type { TaskStatus } from "generated/prisma/enums";
+import {
+    Calendar,
+    PlusIcon,
+    Settings2,
+    SortDescIcon,
+    SparklesIcon,
+} from "lucide-react";
+import * as reactRouter from "react-router";
+import TaskBoard from "~/components/task-board";
+import { Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
 import {
-  Calendar,
-  PlusIcon,
-  Settings2,
-  SortDescIcon,
-  SparklesIcon,
-} from "lucide-react";
-import { Paragraph } from "~/components/typography";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
 } from "~/components/ui/select";
+import { requireIsAuthenticated } from "~/lib/auth";
+import prisma from "~/lib/prisma";
 import { delay } from "~/lib/timing";
+import type { Route } from "./+types/tasks";
 
 export async function action({ request, params }: Route.ActionArgs) {
+  await requireIsAuthenticated(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
   const projectId = params.projectId ? parseInt(params.projectId) : 1;
