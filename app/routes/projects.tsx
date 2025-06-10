@@ -7,25 +7,14 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Paragraph } from "~/components/typography";
-import { isAuthenticated } from "~/lib/auth";
-import { href, redirect } from "react-router";
-import { authCookieStorage } from "~/lib/session";
+import { requireIsAuthenticated } from "~/lib/auth";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const isAuthentic = await isAuthenticated(request);
-  const session = await authCookieStorage.getSession(
-    request.headers.get("cookie")
-  );
-  if (!isAuthentic) {
-    return redirect(href("/login"), {
-      headers: {
-        "set-cokie": await authCookieStorage.destroySession(session),
-      },
-    });
-  }
+  await requireIsAuthenticated(request);
   const projects = await prisma.project.findMany();
   return { projects };
 };
+
 export default function Projects({ loaderData }: Route.ComponentProps) {
   const { projects } = loaderData;
   const [searchTerm, setSearchTerm] = useState<string>("");

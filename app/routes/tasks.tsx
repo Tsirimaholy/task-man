@@ -1,20 +1,20 @@
 import type { TaskStatus } from "generated/prisma/enums";
 import {
-    Calendar,
-    PlusIcon,
-    Settings2,
-    SortDescIcon,
-    SparklesIcon,
+  Calendar,
+  PlusIcon,
+  Settings2,
+  SortDescIcon,
+  SparklesIcon,
 } from "lucide-react";
-import * as reactRouter from "react-router";
+import { data, useFetcher } from "react-router";
 import TaskBoard from "~/components/task-board";
 import { Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from "~/components/ui/select";
 import { requireIsAuthenticated } from "~/lib/auth";
 import prisma from "~/lib/prisma";
@@ -22,7 +22,6 @@ import { delay } from "~/lib/timing";
 import type { Route } from "./+types/tasks";
 
 export async function action({ request, params }: Route.ActionArgs) {
-  await requireIsAuthenticated(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
   const projectId = params.projectId ? parseInt(params.projectId) : 1;
@@ -33,7 +32,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     const status = formData.get("status") as string;
 
     if (!title?.trim()) {
-      return reactRouter.data({ error: "Title is required" }, { status: 400 });
+      return data({ error: "Title is required" }, { status: 400 });
     }
 
     const task = await prisma.task.create({
@@ -77,7 +76,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       },
     });
 
-    return reactRouter.data({ task, success: true });
+    return data({ task, success: true });
   }
   if (intent === "update") {
     await delay(3000);
@@ -86,7 +85,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     const description = formData.get("description") as string;
 
     if (!taskId) {
-      return reactRouter.data(
+      return data(
         { error: "Task ID is required" },
         { status: 400 }
       );
@@ -131,19 +130,19 @@ export async function action({ request, params }: Route.ActionArgs) {
       },
     });
 
-    return reactRouter.data({ task, success: true });
+    return data({ task, success: true });
   }
   if (intent === "update_status") {
     const taskId = parseInt(formData.get("taskId") as string);
     const status = formData.get("status") as TaskStatus;
     if (!taskId) {
-      return reactRouter.data(
+      return data(
         { error: "Task ID is required" },
         { status: 400 }
       );
     }
     if (!status.trim()) {
-      return reactRouter.data({ error: "status is required" }, { status: 400 });
+      return data({ error: "status is required" }, { status: 400 });
     }
     const task = await prisma.task.update({
       where: { id: taskId },
@@ -183,13 +182,14 @@ export async function action({ request, params }: Route.ActionArgs) {
       },
     });
 
-    return reactRouter.data({ task, success: true });
+    return data({ task, success: true });
   }
 
-  return reactRouter.data({ error: "Invalid intent" }, { status: 400 });
+  return data({ error: "Invalid intent" }, { status: 400 });
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  await requireIsAuthenticated(request);
   const projectId = params.projectId ? parseInt(params.projectId) : 1; // Default to project 1 if no projectId in params
   const tasks = await prisma.task.findMany({
     where: {
@@ -251,7 +251,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const reviewTasks = tasks.filter((task) => task.status === "REVIEW");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
 
-  return reactRouter.data({
+  return data({
     project,
     todoTasks,
     inProgressTasks,
@@ -263,7 +263,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function Tasks({ loaderData }: Route.ComponentProps) {
   const { project, todoTasks, inProgressTasks, reviewTasks, doneTasks } =
     loaderData;
-  const fetcher = reactRouter.useFetcher();
+  const fetcher = useFetcher();
 
   return (
     <div className="h-full flex flex-col overflow-scroll">
