@@ -86,7 +86,7 @@ export function AppSidebar() {
               <ChevronsUpDown size={15} className="text-muted-foreground" />
             </div>
             <Avatar className="">
-              <AvatarImage src="/avatari.png" sizes="25px"></AvatarImage>
+              <AvatarImage src="/avatar.png" sizes="25px"></AvatarImage>
               <AvatarFallback className="bg-gray-200">
                 {user?.name ? extractInitial(user.name): <UserIcon/>}
               </AvatarFallback>
