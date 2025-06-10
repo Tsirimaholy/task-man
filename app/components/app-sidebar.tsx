@@ -28,16 +28,12 @@ import {
   Form,
   href,
   NavLink,
-  redirect,
   useLoaderData,
   useLocation,
 } from "react-router";
 import { H6 } from "./typography";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import SearchInput from "~/components/ui/search-input";
-import { logout } from "~/lib/auth";
-import type { ActionFunctionArgs } from "react-router";
-import { data } from "react-router";
 
 const items = [
   {
