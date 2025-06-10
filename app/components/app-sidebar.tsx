@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Layers,
   FolderKanban,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -23,10 +24,20 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { href, NavLink, useLoaderData, useLocation } from "react-router";
+import {
+  Form,
+  href,
+  NavLink,
+  redirect,
+  useLoaderData,
+  useLocation,
+} from "react-router";
 import { H6 } from "./typography";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import SearchInput from "~/components/ui/search-input";
+import { logout } from "~/lib/auth";
+import type { ActionFunctionArgs } from "react-router";
+import { data } from "react-router";
 
 const items = [
   {
@@ -59,6 +70,8 @@ const footerItems = [
     rightIcon: null,
   },
 ] as const;
+
+
 export function AppSidebar() {
   const location = useLocation();
   const { projects } = useLoaderData<Route.ComponentProps["loaderData"]>();
@@ -170,6 +183,14 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+            <SidebarMenuItem>
+              <Form method="POST">
+                <SidebarMenuButton type="submit" name="intent" value={"logout"}>
+                  <LogOut className="inline mr-2" size={17} />
+                  <span className="align-middle">Logout</span>
+                </SidebarMenuButton>
+              </Form>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarFooter>

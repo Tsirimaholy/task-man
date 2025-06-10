@@ -1,4 +1,5 @@
 import {
+  data,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -9,7 +10,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import proseStyles from './styles/prose.css?url'
+import proseStyles from "./styles/prose.css?url";
+import { logout } from "./lib/auth";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,8 +27,17 @@ export const links: Route.LinksFunction = () => [
   {
     rel: "stylesheet",
     href: proseStyles,
-  }
+  },
 ];
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const formData = await request.formData();
+  const intent = formData.get("intent") as string;
+  if (intent === "logout") {
+    return await logout(request);
+  }
+  throw data({ message: "unsuported intent" }, { status: 405 });
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
