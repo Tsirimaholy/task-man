@@ -1,33 +1,51 @@
+import type { User } from "generated/prisma";
 import { href, redirect } from "react-router";
 import { authCookieStorage } from "./session";
+import prisma from "./prisma";
 
-export async function genJwt(user: { email: string; password: string }) {
-  return { name: "john", password: "password" };
+export async function genJwt(user: User) {
+  // TODO: use a real auth strategy
+  return JSON.stringify(user);
 }
 export const verifyUserPassword = async (email: string, password: string) => {
-  console.log(email);
-  console.log(password);
-  if (email === "john@gmail.com" && password === "password") {
-    return true;
-  }
-  return false;
+  // TODO: password should be encrypted
+  const user = prisma.user.findUnique({
+    where: {
+      email,
+      password,
+    },
+  });
+  return user !== null;
 };
 
 export async function isAuthenticated(request: Request) {
   const session = await authCookieStorage.getSession(
     request.headers.get("cookie")
   );
-  if (session.get("jwt")) {
-    return true;
-  }
-  return false;
+  return !!session.get("jwt");
 }
+
 export async function requireIsAuthenticated(request: Request) {
-  if (!(await isAuthenticated(request))) throw Error("Forbidden");
+  const isAuthentic = await isAuthenticated(request);
+  const session = await authCookieStorage.getSession(
+    request.headers.get("cookie")
+  );
+  if (!isAuthentic) {
+    throw redirect(href("/login"), {
+      headers: {
+        "set-cokie": await authCookieStorage.destroySession(session),
+      },
+    });
+  }
 }
-export async function logout(request: Request){
-  const session = await authCookieStorage.getSession(request.headers.get("cookie"));
-  return redirect(href("/login"), {headers: {
-    "set-cookie": await authCookieStorage.destroySession(session)
-  }})
+
+export async function logout(request: Request) {
+  const session = await authCookieStorage.getSession(
+    request.headers.get("cookie")
+  );
+  throw redirect(href("/login"), {
+    headers: {
+      "set-cokie": await authCookieStorage.destroySession(session),
+    },
+  });
 }
