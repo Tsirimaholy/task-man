@@ -34,6 +34,8 @@ import {
 import { H6 } from "./typography";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import SearchInput from "~/components/ui/search-input";
+import { useOptionalUser } from "~/lib/user";
+import { extractInitial } from "~/lib/utils";
 
 const items = [
   {
@@ -71,6 +73,7 @@ const footerItems = [
 export function AppSidebar() {
   const location = useLocation();
   const { projects } = useLoaderData<Route.ComponentProps["loaderData"]>();
+  const user = useOptionalUser();
 
   return (
     <Sidebar>
@@ -83,9 +86,9 @@ export function AppSidebar() {
               <ChevronsUpDown size={15} className="text-muted-foreground" />
             </div>
             <Avatar className="">
-              <AvatarImage src="/avatar.png" sizes="25px"></AvatarImage>
+              <AvatarImage src="/avatari.png" sizes="25px"></AvatarImage>
               <AvatarFallback className="bg-gray-200">
-                <UserIcon />
+                {user?.name ? extractInitial(user.name): <UserIcon/>}
               </AvatarFallback>
             </Avatar>
           </div>

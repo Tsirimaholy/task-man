@@ -154,7 +154,6 @@ export default function TaskBoard({
         onDragOver={(e) => {
           e.preventDefault();
           setAcceptDrop(true);
-          console.log({ "dragged overf": status });
         }}
         onDrop={handleDrop}
         onDragLeave={() => {
