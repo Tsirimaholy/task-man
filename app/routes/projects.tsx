@@ -7,8 +7,22 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Paragraph } from "~/components/typography";
+import { isAuthenticated } from "~/lib/auth";
+import { href, redirect } from "react-router";
+import { authCookieStorage } from "~/lib/session";
 
-export const loader = async ({}: Route.LoaderArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const isAuthentic = await isAuthenticated(request);
+  const session = await authCookieStorage.getSession(
+    request.headers.get("cookie")
+  );
+  if (!isAuthentic) {
+    return redirect(href("/login"), {
+      headers: {
+        "set-cokie": await authCookieStorage.destroySession(session),
+      },
+    });
+  }
   const projects = await prisma.project.findMany();
   return { projects };
 };
@@ -24,7 +38,9 @@ export default function Projects({ loaderData }: Route.ComponentProps) {
   return (
     <div className="mt-8">
       <div className="flex mb-3 items-center justify-between gap-3">
-        <Paragraph textColorClassName="text-muted-foreground">Manage your created projects</Paragraph>
+        <Paragraph textColorClassName="text-muted-foreground">
+          Manage your created projects
+        </Paragraph>
         <div className="flex gap-3">
           <div className="content-end items-center">
             <SearchInput
