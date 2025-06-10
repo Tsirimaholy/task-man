@@ -14,23 +14,21 @@ import { H6, Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
 import { genJwt, verifyUserPassword } from "~/lib/auth";
 import { authCookieStorage } from "~/lib/session";
-import { delay } from "~/lib/timing";
 import type { Route } from "./+types/login";
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  await delay();
   const form = await request.formData();
   const email = form.get("email") as string;
   const password = form.get("password") as string;
-
+  // login and set cookie
   const isAuthentic = await verifyUserPassword(email, password);
   let jwt = null;
   if (isAuthentic) {
-    jwt = await genJwt({ email, password });
+    jwt = await genJwt(isAuthentic);
     const session = await authCookieStorage.getSession();
-    session.set("jwt", JSON.stringify(jwt));
+    session.set("jwt", jwt);
 
-    return redirect("/", {
+    return redirect(href("/"), {
       headers: {
         "set-cookie": await authCookieStorage.commitSession(session, {
           maxAge: 60 * 60 * 24,
