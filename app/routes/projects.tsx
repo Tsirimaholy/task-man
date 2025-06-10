@@ -8,10 +8,11 @@ import { Button } from "~/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Paragraph } from "~/components/typography";
 import { requireIsAuthenticated } from "~/lib/auth";
+import { getMyProjects } from "~/queries/projects";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  await requireIsAuthenticated(request);
-  const projects = await prisma.project.findMany();
+  const user = await requireIsAuthenticated(request);
+  const projects = await getMyProjects(user?.id!);
   return { projects };
 };
 

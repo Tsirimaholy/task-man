@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
-import { Outlet, useLocation, useRouteLoaderData } from "react-router";
+import { Outlet, useLocation, useRouteLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Paragraph } from "~/components/typography";
 import { ChevronRight, Link2Icon, Sparkle } from "lucide-react";
 import { type Route } from ".react-router/types/app/routes/+types/tasks";
@@ -8,6 +8,8 @@ import { AvatarFallback, AvatarImage, Avatar } from "~/components/ui/avatar";
 import { extractInitial } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prisma";
+import { getMyProjects } from "~/queries/projects";
+import { requireIsAuthenticated } from "~/lib/auth";
 
 export function meta({}) {
   return [
@@ -25,8 +27,9 @@ function PageHeaderTitle() {
     </div>
   );
 }
-export const loader = async () => {
-  const projects = await prisma.project.findMany();
+export const loader = async ({request}: LoaderFunctionArgs) => {
+  const user = await requireIsAuthenticated(request)
+  const projects = getMyProjects(user?.id!);
   return { projects };
 };
 export default function Home() {
