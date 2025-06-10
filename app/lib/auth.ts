@@ -37,6 +37,7 @@ export async function requireIsAuthenticated(request: Request) {
       },
     });
   }
+  return session.get("user");
 }
 
 export async function logout(request: Request) {
