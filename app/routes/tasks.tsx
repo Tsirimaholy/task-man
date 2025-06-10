@@ -85,10 +85,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     const description = formData.get("description") as string;
 
     if (!taskId) {
-      return data(
-        { error: "Task ID is required" },
-        { status: 400 }
-      );
+      return data({ error: "Task ID is required" }, { status: 400 });
     }
 
     const task = await prisma.task.update({
@@ -136,10 +133,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     const taskId = parseInt(formData.get("taskId") as string);
     const status = formData.get("status") as TaskStatus;
     if (!taskId) {
-      return data(
-        { error: "Task ID is required" },
-        { status: 400 }
-      );
+      return data({ error: "Task ID is required" }, { status: 400 });
     }
     if (!status.trim()) {
       return data({ error: "status is required" }, { status: 400 });
@@ -190,7 +184,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   await requireIsAuthenticated(request);
-  const projectId = params.projectId ? parseInt(params.projectId) : 1; // Default to project 1 if no projectId in params
+  const projectId = parseInt(params.projectId);
   const tasks = await prisma.task.findMany({
     where: {
       projectId: projectId,

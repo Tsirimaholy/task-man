@@ -7,7 +7,6 @@ import { type Route } from ".react-router/types/app/routes/+types/tasks";
 import { AvatarFallback, AvatarImage, Avatar } from "~/components/ui/avatar";
 import { extractInitial } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
-import prisma from "~/lib/prisma";
 import { getMyProjects } from "~/queries/projects";
 import { requireIsAuthenticated } from "~/lib/auth";
 
