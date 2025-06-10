@@ -1,31 +1,52 @@
 import { Loader } from "lucide-react";
 import {
-    Form,
-    href,
-    NavLink,
-    redirect,
-    useActionData,
-    useNavigation,
+  data,
+  Form,
+  href,
+  NavLink,
+  redirect,
+  useActionData,
+  useNavigation,
 } from "react-router";
+import Input from "~/components/form-input/input";
+import Label from "~/components/form-input/label";
 import { H6, Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import { genJwt, verifyUserPassword } from "~/lib/auth";
+import { authCookieStorage } from "~/lib/session";
 import { delay } from "~/lib/timing";
 import type { Route } from "./+types/login";
 
-export const action = async ({}: Route.ActionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   await delay();
-  if (false) {
-    return {
+  const form = await request.formData();
+  const email = form.get("email") as string;
+  const password = form.get("password") as string;
+
+  const isAuthentic = await verifyUserPassword(email, password);
+  let jwt = null;
+  if (isAuthentic) {
+    jwt = await genJwt({ email, password });
+    const session = await authCookieStorage.getSession();
+    session.set("jwt", JSON.stringify(jwt));
+
+    return redirect("/", {
+      headers: {
+        "set-cookie": await authCookieStorage.commitSession(session, {
+          maxAge: 60 * 60 * 24,
+        }),
+      },
+    });
+  } else {
+    return data({
       success: false,
       errors: {
         globalError: "",
         email: ["Invalid email"],
         password: ["Wrong Password"],
       },
-    };
+    });
   }
-  return redirect(href("/"));
 };
 export default function Loging() {
   const navigation = useNavigation();
@@ -43,59 +64,49 @@ export default function Loging() {
         </Paragraph>
         <Form className="mt-4" method="POST">
           <div className="mb-5">
-            <label
-              htmlFor="email"
-              className={`font-bold ${
-                !!data?.errors.email.length ? "text-red-600" : ""
-              }`}
-            >
+            <Label htmlFor="email" isError={!!data?.errors.email.length}>
               Email
-            </label>
+            </Label>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="Enter your email"
-              className={
-                !!data?.errors.email.length
-                  ? "border-red-600 text-red-600 bg-red-100"
-                  : ""
+              isError={!!data?.errors.email.length}
+              errorMessage={
+                !!data?.errors.email.length ? data?.errors.email[0] : undefined
               }
             />
-            <span className="text-red-600">
-              {!!data?.errors.email.length && data?.errors.email[0]}
-            </span>
           </div>
           <div className="mb-5">
-            <label
-              htmlFor="password"
-              className={`font-bold ${
-                !!data?.errors.email.length ? "text-red-600" : ""
-              }`}
-            >
+            <Label htmlFor="password" isError={!!data?.errors.password.length}>
               Password
-            </label>
+            </Label>
             <Input
               id="password"
               type="password"
+              name="password"
               placeholder="Enter your password"
-              className={`${
+              isError={!!data?.errors.password.length}
+              errorMessage={
                 !!data?.errors.password.length
-                  ? "border-red-600 text-red-600 bg-red-100"
-                  : ""
-              }`}
+                  ? data?.errors.password[0]
+                  : undefined
+              }
             />
-            <span className="text-red-600">
-              {!!data?.errors.password.length && data?.errors.password[0]}
-            </span>
           </div>
           <Button
             className="w-full"
             type="submit"
             disabled={navigation.state !== "idle"}
           >
-            {navigation.state === "submitting" ? "Submitting..." : "Login"}
-            {navigation.state === "submitting" && (
-              <Loader className="animate-spin" />
+            {navigation.state === "submitting" ? (
+              <>
+                Submitting...
+                <Loader className="animate-spin" />
+              </>
+            ) : (
+              "Login"
             )}
           </Button>
         </Form>
