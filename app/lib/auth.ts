@@ -1,5 +1,5 @@
 import type { User } from "generated/prisma";
-import { redirect } from "react-router";
+import { href, redirect } from "react-router";
 import { authCookieStorage } from "./session";
 import prisma from "~/lib/prisma";
 
@@ -31,7 +31,7 @@ export async function requireIsAuthenticated(request: Request) {
     request.headers.get("cookie")
   );
   if (!isAuthentic) {
-    throw redirect("/login", {
+    throw redirect(href("/login"), {
       headers: {
         "set-cookie": await authCookieStorage.destroySession(session),
       },
@@ -43,7 +43,7 @@ export async function logout(request: Request) {
   const session = await authCookieStorage.getSession(
     request.headers.get("cookie")
   );
-  throw redirect("/login", {
+  throw redirect(href("/login"), {
     headers: {
       "set-cookie": await authCookieStorage.destroySession(session),
     },
