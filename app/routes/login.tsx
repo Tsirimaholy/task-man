@@ -27,6 +27,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     jwt = await genJwt(isAuthentic);
     const session = await authCookieStorage.getSession();
     session.set("jwt", jwt);
+    session.set("user", isAuthentic);
 
     return redirect(href("/"), {
       headers: {

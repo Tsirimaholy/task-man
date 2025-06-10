@@ -1,6 +1,8 @@
+import type { User } from "generated/prisma";
 import { createCookieSessionStorage } from "react-router";
 interface AuthSessionStorage {
   jwt: string;
+  user: User;
 }
 export const authCookieStorage = createCookieSessionStorage<AuthSessionStorage>(
   {
