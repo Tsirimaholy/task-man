@@ -25,13 +25,36 @@ export async function isAuthenticated(request: Request) {
   return !!session.get("jwt");
 }
 
+/**
+* Allow only anonymous user to access the route
+* @param request
+* @returns void
+*
+* Example:
+*
+* `/login` should not be accesible anymore after the user logged in
+*
+*/
+export async function requireIsAnonymous(request: Request) {
+  const isAuthentic = await isAuthenticated(request);
+  if (isAuthentic) {
+    throw redirect(href("/"));
+  }
+}
+
 export async function requireIsAuthenticated(request: Request) {
   const isAuthentic = await isAuthenticated(request);
   const session = await authCookieStorage.getSession(
     request.headers.get("cookie")
   );
+
   if (!isAuthentic) {
-    throw redirect(href("/login"), {
+    const redirectTo = new URL(request.url).pathname;
+    // /login?redirectTo=<the_accessed_path>
+    const redirectUrl = new URL(request.url)
+    redirectUrl.pathname = href("/login")
+    redirectUrl.searchParams.append("redirectTo", redirectTo)
+    throw redirect(redirectUrl.toString(), {
       headers: {
         "set-cookie": await authCookieStorage.destroySession(session),
       },

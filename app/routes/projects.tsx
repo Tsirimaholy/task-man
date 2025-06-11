@@ -1,4 +1,3 @@
-import prisma from "~/lib/prisma";
 import type { Route } from "./+types/projects";
 import { DataTable } from "~/components/project/data-table";
 import { columns } from "~/components/project/columns";

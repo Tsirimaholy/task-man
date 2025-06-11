@@ -1,18 +1,18 @@
 import {
-  data,
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
+    data,
+    isRouteErrorResponse,
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import proseStyles from "./styles/prose.css?url";
 import { logout } from "./lib/auth";
 import { authCookieStorage } from "./lib/session";
+import proseStyles from "./styles/prose.css?url";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

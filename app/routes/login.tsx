@@ -12,9 +12,14 @@ import Input from "~/components/form-input/input";
 import Label from "~/components/form-input/label";
 import { H6, Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
-import { genJwt, verifyUserPassword } from "~/lib/auth";
+import { genJwt, requireIsAnonymous, verifyUserPassword } from "~/lib/auth";
 import { authCookieStorage } from "~/lib/session";
 import type { Route } from "./+types/login";
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  await requireIsAnonymous(request);
+  return null;
+};
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const form = await request.formData();
@@ -29,7 +34,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
     session.set("jwt", jwt);
     session.set("user", isAuthentic);
 
-    return redirect(href("/"), {
+    const redirectTo = new URL(request.url).searchParams.get("redirectTo");
+    return redirect(`${redirectTo ? redirectTo : href("/")}`, {
       headers: {
         "set-cookie": await authCookieStorage.commitSession(session, {
           maxAge: 60 * 60 * 24,
