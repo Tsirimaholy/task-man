@@ -1,14 +1,32 @@
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
-import { Outlet, useLocation, useRouteLoaderData, type LoaderFunctionArgs } from "react-router";
+import {
+  Outlet,
+  useLocation,
+  useRouteLoaderData,
+  type LoaderFunctionArgs,
+} from "react-router";
 import { Paragraph } from "~/components/typography";
-import { ChevronRight, Link2Icon, Sparkle } from "lucide-react";
+import {
+  ChevronRight,
+  ClipboardCheck,
+  ClipboardIcon,
+  Link2Icon,
+  Sparkle,
+} from "lucide-react";
 import { type Route } from ".react-router/types/app/routes/+types/tasks";
 import { AvatarFallback, AvatarImage, Avatar } from "~/components/ui/avatar";
 import { extractInitial } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { getMyProjects } from "~/queries/projects";
 import { requireIsAuthenticated } from "~/lib/auth";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { Input } from "~/components/ui/input";
+import { useState } from "react";
 
 export function meta({}) {
   return [
@@ -26,8 +44,8 @@ function PageHeaderTitle() {
     </div>
   );
 }
-export const loader = async ({request}: LoaderFunctionArgs) => {
-  const user = await requireIsAuthenticated(request)
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await requireIsAuthenticated(request);
   const projects = getMyProjects(user?.id!);
   return { projects };
 };
@@ -35,7 +53,7 @@ export default function Home() {
   // Fetch data for active project
   const activeProjectData =
     useRouteLoaderData<Route.ComponentProps["loaderData"]>("routes/tasks");
-
+  const [copiedSuccessFully, setCopiedSuccessFully] = useState(false);
   return (
     <SidebarProvider className="overflow-hidden ">
       <AppSidebar />
@@ -82,14 +100,53 @@ export default function Home() {
                   </>
                 ) : null}
               </div>
-              <Button
-                variant={"secondary"}
-                size={"sm"}
-                className="text-sm text-muted-foreground"
+              {activeProjectData &&
+              <Popover
+                onOpenChange={(open) => !open && setCopiedSuccessFully(false)}
               >
-                <Link2Icon size={15} className="rotate-[135deg]"></Link2Icon>
-                Share
-              </Button>
+                <PopoverContent className="flex items-center gap-2">
+                  <Input
+                    id="sharable-link"
+                    defaultValue={
+                      typeof window != "undefined"
+                        ? window.location.toString()
+                        : ""
+                    }
+                    readOnly
+                  />
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={async () => {
+                      const input = document.getElementById(
+                        "sharable-link"
+                      ) as HTMLInputElement;
+                      input.select();
+                      await navigator.clipboard.writeText(input.value);
+                      setCopiedSuccessFully(true);
+                    }}
+                  >
+                    {!copiedSuccessFully ? (
+                      <ClipboardIcon />
+                    ) : (
+                      <ClipboardCheck />
+                    )}
+                  </Button>
+                </PopoverContent>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"secondary"}
+                    size={"sm"}
+                    className="text-sm text-muted-foreground"
+                  >
+                    <Link2Icon
+                      size={15}
+                      className="rotate-[135deg]"
+                    ></Link2Icon>
+                    Share
+                  </Button>
+                </PopoverTrigger>
+              </Popover>}
             </div>
           </nav>
         </header>
