@@ -1,34 +1,33 @@
 import type { TaskStatus } from "generated/prisma/enums";
 import {
-  Calendar,
-  PlusIcon,
-  Settings2,
-  SortDescIcon,
-  SparklesIcon,
-  X,
+    Calendar,
+    PlusIcon,
+    Settings2,
+    SortDescIcon,
+    SparklesIcon,
+    X,
 } from "lucide-react";
+import { useState } from "react";
 import { data, useFetcher, useSubmit } from "react-router";
+import { MultiSelect } from "~/components/multi-select";
 import TaskBoard from "~/components/task-board";
 import { Paragraph } from "~/components/typography";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
 } from "~/components/ui/select";
 import { requireIsAuthenticated } from "~/lib/auth";
 import prisma from "~/lib/prisma";
-import { delay } from "~/lib/timing";
 import type { Route } from "./+types/tasks";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import { useState } from "react";
-import { MultiSelect } from "~/components/multi-select";
-import { Badge } from "~/components/ui/badge";
 
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -88,7 +87,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     return data({ task, success: true });
   }
   if (intent === "update") {
-    await delay(3000);
     const taskId = parseInt(formData.get("taskId") as string);
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -137,6 +135,25 @@ export async function action({ request, params }: Route.ActionArgs) {
     });
 
     return data({ task, success: true });
+  }
+  if (intent === "change_labels") {
+    const taskId = parseInt(formData.get("taskId") as string);
+    const labels = JSON.parse(
+      formData.get("labelIds") as unknown as string
+    ) as string[];
+    const mappedLabels = labels.map((i) => parseInt(i));
+    await prisma.labelOnTask.deleteMany({
+      where: {
+        taskId,
+      },
+    });
+    await prisma.labelOnTask.createMany({
+      data: mappedLabels.map((l) => ({
+        labelId: l,
+        taskId: taskId,
+      })),
+    });
+    return;
   }
   if (intent === "update_status") {
     const taskId = parseInt(formData.get("taskId") as string);
@@ -188,7 +205,10 @@ export async function action({ request, params }: Route.ActionArgs) {
     return data({ task, success: true });
   }
 
-  return data({ error: "Invalid intent" }, { status: 400 });
+  return data(
+    { error: "Invalid intent", message: `${intent} is an invalid intent` },
+    { status: 400 }
+  );
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -344,7 +364,11 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
       {/* Action */}
       <nav className="mb-1 border-b py-2 flex justify-between">
         <div className="flex gap-2">
-          <Popover open={popoverOpen} onOpenChange={setPopOverOpen} modal={false}>
+          <Popover
+            open={popoverOpen}
+            onOpenChange={setPopOverOpen}
+            modal={false}
+          >
             <PopoverTrigger asChild>
               <Button variant={"secondary"} className="text-xs" size={"sm"}>
                 <Settings2 /> Filter

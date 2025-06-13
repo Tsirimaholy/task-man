@@ -19,10 +19,13 @@ import { Separator } from "~/components/ui/separator";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { useState, useEffect, useRef } from "react";
-import type { ITask, TAssignee } from "./task-board";
+import type { ITask } from "./task-board";
 import BoardStatusIcon from "./board-status-icon";
-import { useFetcher } from "react-router";
+import { useFetcher, useLoaderData, useNavigation } from "react-router";
 import { getInitial } from "~/lib/core_utils";
+import { MultiSelect } from "./multi-select";
+import type { loader } from "~/routes/tasks";
+import { useSubmit } from "react-router";
 
 interface TaskCardProps {
   task: ITask;
@@ -30,6 +33,18 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task }: TaskCardProps) {
+  const { labels } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const selected = [
+    ...task.labels.map((l) => ({
+      color: l.label.color,
+      label: l.label.name,
+      value: l.label.id.toString(),
+    })),
+  ];
+  useEffect(() => {
+    console.log({ selected });
+  }, [task]);
   const updateTaskFormFetcher = useFetcher();
   const isSaving = updateTaskFormFetcher.state === "submitting";
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -114,6 +129,7 @@ export default function TaskCard({ task }: TaskCardProps) {
     }
   };
 
+  const submit = useSubmit();
   return (
     <div className="mt-2 max-w-full transition-all duration-200 px-1">
       <Card
@@ -189,18 +205,28 @@ export default function TaskCard({ task }: TaskCardProps) {
             </div>
           )}
           <div className="flex gap-1 mt-2">
-            {task.labels.map((labelOnTask) => (
-              <Badge
-                key={labelOnTask.label.id}
-                className="text-blue-400 bg-blue-100 text-xs"
-                style={{
-                  backgroundColor: labelOnTask.label.color + "20",
-                  color: labelOnTask.label.color,
-                }}
-              >
-                {labelOnTask.label.name}
-              </Badge>
-            ))}
+            <MultiSelect
+              placeholder={
+                navigation.state === "submitting" ? "Updating..." : "Add label"
+              }
+              selected={selected}
+              setSelected={() => {}}
+              onChange={(selected) => {
+                submit(
+                  {
+                    taskId: task.id,
+                    intent: "change_labels",
+                    labelIds: JSON.stringify(selected.map((s) => s.value)),
+                  },
+                  { method: "PATCH" }
+                );
+              }}
+              options={labels.map((l) => ({
+                color: l.color,
+                label: l.name,
+                value: l.id.toString(),
+              }))}
+            />
           </div>
         </CardDescription>
         <Separator className="border-[0.5px] border-dashed bg-[none] my-3.5" />
