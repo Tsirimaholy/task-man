@@ -7,7 +7,7 @@ import {
   SparklesIcon,
   X,
 } from "lucide-react";
-import { data, useFetcher } from "react-router";
+import { data, useFetcher, useSubmit } from "react-router";
 import TaskBoard from "~/components/task-board";
 import { Paragraph } from "~/components/typography";
 import { Button } from "~/components/ui/button";
@@ -334,10 +334,10 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
     labels,
   } = loaderData;
   const fetcher = useFetcher();
-  const filterFetcher = useFetcher<typeof loader>();
   const [selectedLabels, setSelectedLabels] = useState<
     { label: string; value: string; color: string }[]
   >([]);
+  const submit = useSubmit()
 
   return (
     <div className="h-full flex flex-col overflow-scroll">
@@ -359,7 +359,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
                       e.stopPropagation();
                       // clear multi select
                       setSelectedLabels([]);
-                      filterFetcher.load("");
+                      submit({});
                     }}
                   >
                     <X />
@@ -370,9 +370,12 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
             <PopoverContent>
               <MultiSelect
                 onChange={(selected) => {
-                  filterFetcher.submit({
+                  if(selected.length===0){
+                    submit({})
+                    return
+                  }
+                  submit({
                     labelsIn: [selected.map((i) => i.value)],
-                    intent: "filter",
                   });
                 }}
                 selected={selectedLabels}
@@ -435,20 +438,20 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
         {/* To-do Column */}
         <TaskBoard
           status="TODO"
-          tasks={filterFetcher?.data?.todoTasks || todoTasks}
+          tasks={todoTasks}
           title="To-do"
           isLoading={fetcher.state === "loading"}
         />
         {/* In Progress Column */}
         <TaskBoard
           status="IN_PROGRESS"
-          tasks={filterFetcher?.data?.inProgressTasks || inProgressTasks}
+          tasks={inProgressTasks}
           title="In-Progress"
           isLoading={fetcher.state === "loading"}
         />
         {/* Review Column */}
         <TaskBoard
-          tasks={filterFetcher?.data?.reviewTasks || reviewTasks}
+          tasks={reviewTasks}
           title="In-review"
           status="REVIEW"
           isLoading={fetcher.state === "loading"}
@@ -456,7 +459,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
         {/* Done Column */}
         <TaskBoard
           status="DONE"
-          tasks={filterFetcher?.data?.doneTasks || doneTasks}
+          tasks={doneTasks}
           title="Done"
           isLoading={fetcher.state === "loading"}
         />
