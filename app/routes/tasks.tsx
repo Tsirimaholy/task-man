@@ -5,6 +5,7 @@ import {
   Settings2,
   SortDescIcon,
   SparklesIcon,
+  X,
 } from "lucide-react";
 import { data, useFetcher } from "react-router";
 import TaskBoard from "~/components/task-board";
@@ -20,6 +21,14 @@ import { requireIsAuthenticated } from "~/lib/auth";
 import prisma from "~/lib/prisma";
 import { delay } from "~/lib/timing";
 import type { Route } from "./+types/tasks";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { useEffect, useState } from "react";
+import { MultiSelect } from "~/components/multi-select";
+import { Badge } from "~/components/ui/badge";
 
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -184,46 +193,106 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   await requireIsAuthenticated(request);
+  const searchParams = new URL(request.url).searchParams;
+  const labels = await prisma.label.findMany();
+  const labelsInParams = searchParams.getAll("labelsIn");
   const projectId = parseInt(params.projectId);
-  const tasks = await prisma.task.findMany({
-    where: {
-      projectId: projectId,
-    },
-    include: {
-      assignments: {
-        include: {
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+
+  let tasks = [];
+  const labelIds = labelsInParams
+    .map((labelId) => {
+      if (labelId) return parseInt(labelId);
+    })
+    .filter((labelId) => typeof labelId !== "undefined");
+
+  if (searchParams.has("labelsIn") && labelIds.length > 0) {
+    tasks = await prisma.task.findMany({
+      where: {
+        projectId: projectId,
+        labels: {
+          some: {
+            labelId: {
+              in: [...labelIds],
             },
           },
         },
       },
-      labels: {
-        include: {
-          label: true,
-        },
-      },
-      comments: {
-        include: {
-          author: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+      include: {
+        assignments: {
+          include: {
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
           },
         },
+        labels: {
+          include: {
+            label: true,
+          },
+        },
+        comments: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        subtasks: true,
+        parent: true,
       },
-      subtasks: true,
-      parent: true,
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } else {
+    tasks = await prisma.task.findMany({
+      where: {
+        projectId: projectId,
+      },
+      include: {
+        assignments: {
+          include: {
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        labels: {
+          include: {
+            label: true,
+          },
+        },
+        comments: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        subtasks: true,
+        parent: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: {
@@ -251,22 +320,71 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     inProgressTasks,
     reviewTasks,
     doneTasks,
+    labels,
   });
 }
 
 export default function Tasks({ loaderData }: Route.ComponentProps) {
-  const { project, todoTasks, inProgressTasks, reviewTasks, doneTasks } =
-    loaderData;
+  const {
+    project,
+    todoTasks,
+    inProgressTasks,
+    reviewTasks,
+    doneTasks,
+    labels,
+  } = loaderData;
   const fetcher = useFetcher();
+  const filterFetcher = useFetcher<typeof loader>();
+  const [selectedLabels, setSelectedLabels] = useState<
+    { label: string; value: string; color: string }[]
+  >([]);
 
   return (
     <div className="h-full flex flex-col overflow-scroll">
       {/* Action */}
       <nav className="mb-1 border-b py-2 flex justify-between">
         <div className="flex gap-2">
-          <Button variant={"secondary"} className="text-xs" size={"sm"}>
-            <Settings2 /> Filter
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant={"secondary"} className="text-xs" size={"sm"}>
+                <Settings2 /> Filter
+                {selectedLabels.length > 0 && (
+                  <Badge>{selectedLabels.length}</Badge>
+                )}
+                {selectedLabels.length > 0 && (
+                  // reset label filter button
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // clear multi select
+                      setSelectedLabels([]);
+                      filterFetcher.load("");
+                    }}
+                  >
+                    <X />
+                  </button>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <MultiSelect
+                onChange={(selected) => {
+                  filterFetcher.submit({
+                    labelsIn: [selected.map((i) => i.value)],
+                    intent: "filter",
+                  });
+                }}
+                selected={selectedLabels}
+                setSelected={setSelectedLabels}
+                options={labels.map((label) => ({
+                  label: label.name,
+                  value: `${label.id}`,
+                  color: label.color,
+                }))}
+              />
+            </PopoverContent>
+          </Popover>
           <Button variant={"secondary"} size={"sm"} className="text-xs">
             <SortDescIcon /> Sort
           </Button>
@@ -317,20 +435,20 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
         {/* To-do Column */}
         <TaskBoard
           status="TODO"
-          tasks={todoTasks}
+          tasks={filterFetcher?.data?.todoTasks || todoTasks}
           title="To-do"
           isLoading={fetcher.state === "loading"}
         />
         {/* In Progress Column */}
         <TaskBoard
           status="IN_PROGRESS"
-          tasks={inProgressTasks}
+          tasks={filterFetcher?.data?.inProgressTasks || inProgressTasks}
           title="In-Progress"
           isLoading={fetcher.state === "loading"}
         />
         {/* Review Column */}
         <TaskBoard
-          tasks={reviewTasks}
+          tasks={filterFetcher?.data?.reviewTasks || reviewTasks}
           title="In-review"
           status="REVIEW"
           isLoading={fetcher.state === "loading"}
@@ -338,7 +456,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
         {/* Done Column */}
         <TaskBoard
           status="DONE"
-          tasks={doneTasks}
+          tasks={filterFetcher?.data?.doneTasks || doneTasks}
           title="Done"
           isLoading={fetcher.state === "loading"}
         />

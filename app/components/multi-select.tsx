@@ -1,9 +1,4 @@
-import {
-  useRef,
-  useState,
-  useCallback,
-  type KeyboardEvent,
-} from "react";
+import { useRef, useState, useCallback, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,11 +14,11 @@ import { Paragraph } from "./typography";
 type SelectData = Record<"value" | "label" | "color", string>;
 
 interface MultiSelectProps {
-    options: SelectData[];
-    selected: SelectData[];
-    setSelected: React.Dispatch<React.SetStateAction<SelectData[]>>;
-    onSelect?: (selected: SelectData[]) => void;
-    onChange?: (selected: SelectData[]) => void;
+  options: SelectData[];
+  selected: SelectData[];
+  setSelected: React.Dispatch<React.SetStateAction<SelectData[]>>;
+  onSelect?: (selected: SelectData[]) => void;
+  onChange?: (selected: SelectData[]) => void;
 }
 
 export function MultiSelect({
@@ -38,9 +33,12 @@ export function MultiSelect({
   const [inputValue, setInputValue] = useState("");
 
   const handleUnselect = useCallback((unselectedItem: SelectData) => {
-    onChange && onChange(selected.filter((s) => s.value !== unselectedItem.value))
-    setSelected((prev) => prev.filter((s) => s.value !== unselectedItem.value));
-  }, []);
+    const filteredData = [
+      ...selected.filter((s) => s.value !== unselectedItem.value),
+    ];
+    setSelected(filteredData);
+    onChange && onChange(filteredData);
+  }, [selected]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
     const input = inputRef.current;
@@ -52,9 +50,9 @@ export function MultiSelect({
             newSelected.pop();
             return newSelected;
           });
-          const selectedWithoutLastItem = [...selected]
+          const selectedWithoutLastItem = [...selected];
           selectedWithoutLastItem.pop();
-          onChange && onChange(selectedWithoutLastItem)
+          onChange && onChange(selectedWithoutLastItem);
         }
       }
       // This is not a default behaviour of the <input /> field
@@ -62,7 +60,7 @@ export function MultiSelect({
         input.blur();
       }
     }
-  }, []);
+  }, [selected]);
   const selectables = options.filter(
     (option) => !selected.some((s) => s.value == option.value)
   );
@@ -72,7 +70,9 @@ export function MultiSelect({
       onKeyDown={handleKeyDown}
       className="overflow-visible bg-transparent"
     >
-      <Paragraph className="text-sm mb-1" textColorClassName="text-gray-700">Labels</Paragraph>
+      <Paragraph className="text-sm mb-1" textColorClassName="text-gray-700">
+        Labels
+      </Paragraph>
       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
           {selected.map((label) => {

@@ -49,6 +49,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const projects = getMyProjects(user?.id!);
   return { projects };
 };
+
 export default function Home() {
   // Fetch data for active project
   const activeProjectData =
