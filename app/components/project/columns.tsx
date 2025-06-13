@@ -2,6 +2,8 @@ import { type ColumnDef } from "@tanstack/react-table";
 import type { Project } from "generated/prisma/client";
 import { href, NavLink } from "react-router";
 import { Button } from "../ui/button";
+import { DeleteProjectDialog } from "./delete-project-dialog";
+import { EditProjectDialog } from "./edit-project-dialog";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -53,5 +55,19 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "updatedAt",
     header: "Updated At",
     cell: ({ row }) => row.original.updatedAt.toLocaleString(),
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const project = row.original;
+      
+      return (
+        <div className="flex items-center gap-2">
+          <EditProjectDialog project={project} />
+          <DeleteProjectDialog project={project} />
+        </div>
+      );
+    },
   },
 ];

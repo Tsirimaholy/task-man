@@ -1,15 +1,16 @@
-import type { Route } from "./+types/projects";
-import { DataTable } from "~/components/project/data-table";
-import { columns } from "~/components/project/columns";
-import SearchInput from "~/components/ui/search-input";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigation } from "react-router";
-import { Paragraph } from "~/components/typography";
-import { requireIsAuthenticated } from "~/lib/auth";
-import { getMyProjects, createProject } from "~/queries/projects";
-import { CreateProjectDialog } from "~/components/project/create-project-dialog";
-import { validateProjectData } from "~/lib/validation";
 import { toast } from "sonner";
+import { columns } from "~/components/project/columns";
+import { CreateProjectDialog } from "~/components/project/create-project-dialog";
+import { DataTable } from "~/components/project/data-table";
+import { Paragraph } from "~/components/typography";
+import SearchInput from "~/components/ui/search-input";
+import { requireIsAuthenticated } from "~/lib/auth";
+import { validateProjectData } from "~/lib/validation";
+import { createProject, deleteProject, getMyProjects, updateProject } from "~/queries/projects";
+import type { Route } from "./+types/projects";
+
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const user = await requireIsAuthenticated(request);
@@ -51,13 +52,68 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
   }
 
+  if (intent === "edit-project") {
+    const projectId = formData.get("projectId")?.toString();
+    const name = formData.get("name")?.toString();
+    const description = formData.get("description")?.toString();
+
+    if (!projectId) {
+      return { error: "Project ID is required" };
+    }
+
+    // Validation
+    const validation = validateProjectData({ name, description });
+
+    if (!validation.isValid) {
+      return { fieldErrors: validation.errors };
+    }
+
+    try {
+      const updatedProject = await updateProject(parseInt(projectId), user!.id, {
+        name: name!.trim(),
+        description: description?.trim() || undefined,
+      });
+
+      return {
+        success: true,
+        message: `Project "${updatedProject.name}" updated successfully`,
+        updatedProject,
+      };
+    } catch (error) {
+      console.error("Error updating project:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to update project. Please try again.";
+      return { error: errorMessage };
+    }
+  }
+
+  if (intent === "delete-project") {
+    const projectId = formData.get("projectId")?.toString();
+
+    if (!projectId) {
+      return { error: "Project ID is required" };
+    }
+
+    try {
+      const deletedProject = await deleteProject(parseInt(projectId), user!.id);
+      return {
+        success: true,
+        message: `Project "${deletedProject.name}" deleted successfully`,
+        deletedProject,
+      };
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete project. Please try again.";
+      return { error: errorMessage };
+    }
+  }
+
   return { error: "Invalid action" };
 };
 
 export default function Projects({ loaderData }: Route.ComponentProps) {
   const { projects } = loaderData;
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const actionData = useActionData();
+  const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const filteredProjects = projects.filter(
     (project) =>
@@ -69,9 +125,19 @@ export default function Projects({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     if (navigation.state === "idle" && actionData) {
       if (actionData.success && actionData.message) {
-        toast("Project created successfully", {
-          description: actionData.message,
-        });
+        if (actionData.project) {
+          toast("Project created successfully", {
+            description: actionData.message,
+          });
+        } else if (actionData.updatedProject) {
+          toast("Project updated successfully", {
+            description: actionData.message,
+          });
+        } else if (actionData.deletedProject) {
+          toast("Project deleted successfully", {
+            description: actionData.message,
+          });
+        }
       } else if (actionData.error) {
         toast("Error", {
           description: actionData.error,
