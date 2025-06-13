@@ -34,3 +34,73 @@ export async function createProject(data: {
   });
   return project;
 }
+
+export async function updateProject(
+  projectId: number,
+  userId: number,
+  data: {
+    name?: string;
+    description?: string;
+  }
+) {
+  // First check if the user has permission to edit the project (owner or admin)
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      members: {
+        some: {
+          userId,
+          role: {
+            in: ["OWNER", "ADMIN"],
+          },
+        },
+      },
+    },
+  });
+
+  if (!project) {
+    throw new Error("Project not found or you don't have permission to edit it");
+  }
+
+  // Update the project
+  const updatedProject = await prisma.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      ...(data.name && { name: data.name }),
+      ...(data.description !== undefined && { description: data.description }),
+      updatedAt: new Date(),
+    },
+  });
+
+  return updatedProject;
+}
+
+export async function deleteProject(projectId: number, userId: number) {
+  // First check if the user is the owner of the project
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      members: {
+        some: {
+          userId,
+          role: "OWNER",
+        },
+      },
+    },
+  });
+
+  if (!project) {
+    throw new Error("Project not found or you don't have permission to delete it");
+  }
+
+  // Delete the project (cascading deletes will handle related records)
+  await prisma.project.delete({
+    where: {
+      id: projectId,
+    },
+  });
+
+  return project;
+}
