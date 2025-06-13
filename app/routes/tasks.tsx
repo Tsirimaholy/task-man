@@ -26,7 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MultiSelect } from "~/components/multi-select";
 import { Badge } from "~/components/ui/badge";
 
@@ -344,7 +344,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
       {/* Action */}
       <nav className="mb-1 border-b py-2 flex justify-between">
         <div className="flex gap-2">
-          <Popover open={popoverOpen} onOpenChange={setPopOverOpen}>
+          <Popover open={popoverOpen} onOpenChange={setPopOverOpen} modal={false}>
             <PopoverTrigger asChild>
               <Button variant={"secondary"} className="text-xs" size={"sm"}>
                 <Settings2 /> Filter
