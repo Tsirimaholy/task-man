@@ -337,14 +337,14 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
   const [selectedLabels, setSelectedLabels] = useState<
     { label: string; value: string; color: string }[]
   >([]);
-  const submit = useSubmit()
-
+  const submit = useSubmit();
+  const [popoverOpen, setPopOverOpen] = useState(false);
   return (
     <div className="h-full flex flex-col overflow-scroll">
       {/* Action */}
       <nav className="mb-1 border-b py-2 flex justify-between">
         <div className="flex gap-2">
-          <Popover>
+          <Popover open={popoverOpen} onOpenChange={setPopOverOpen}>
             <PopoverTrigger asChild>
               <Button variant={"secondary"} className="text-xs" size={"sm"}>
                 <Settings2 /> Filter
@@ -360,6 +360,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
                       // clear multi select
                       setSelectedLabels([]);
                       submit({});
+                      setPopOverOpen(false);
                     }}
                   >
                     <X />
@@ -370,9 +371,9 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
             <PopoverContent>
               <MultiSelect
                 onChange={(selected) => {
-                  if(selected.length===0){
-                    submit({})
-                    return
+                  if (selected.length === 0) {
+                    submit({});
+                    return;
                   }
                   submit({
                     labelsIn: [selected.map((i) => i.value)],
