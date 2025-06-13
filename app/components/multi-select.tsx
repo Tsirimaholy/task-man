@@ -34,7 +34,7 @@ export function MultiSelect({
 
   const handleUnselect = useCallback((unselectedItem: SelectData) => {
     const filteredData = [
-      ...selected.filter((s) => s.value !== unselectedItem.value),
+      ...selected.filter((s) => s != unselectedItem),
     ];
     setSelected(filteredData);
     onChange && onChange(filteredData);
