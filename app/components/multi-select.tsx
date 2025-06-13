@@ -14,6 +14,8 @@ import { Paragraph } from "./typography";
 type SelectData = Record<"value" | "label" | "color", string>;
 
 interface MultiSelectProps {
+  label?: string;
+  placeholder?: string;
   options: SelectData[];
   selected: SelectData[];
   setSelected: React.Dispatch<React.SetStateAction<SelectData[]>>;
@@ -22,6 +24,8 @@ interface MultiSelectProps {
 }
 
 export function MultiSelect({
+  label = "",
+  placeholder = "",
   options,
   selected,
   setSelected,
@@ -32,35 +36,39 @@ export function MultiSelect({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const handleUnselect = useCallback((unselectedItem: SelectData) => {
-    const filteredData = [
-      ...selected.filter((s) => s != unselectedItem),
-    ];
-    setSelected(filteredData);
-    onChange && onChange(filteredData);
-  }, [selected]);
+  const handleUnselect = useCallback(
+    (unselectedItem: SelectData) => {
+      const filteredData = [...selected.filter((s) => s != unselectedItem)];
+      setSelected(filteredData);
+      onChange && onChange(filteredData);
+    },
+    [selected]
+  );
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
-    const input = inputRef.current;
-    if (input) {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (input.value === "") {
-          setSelected((prev) => {
-            const newSelected = [...prev];
-            newSelected.pop();
-            return newSelected;
-          });
-          const selectedWithoutLastItem = [...selected];
-          selectedWithoutLastItem.pop();
-          onChange && onChange(selectedWithoutLastItem);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      const input = inputRef.current;
+      if (input) {
+        if (e.key === "Delete" || e.key === "Backspace") {
+          if (input.value === "") {
+            setSelected((prev) => {
+              const newSelected = [...prev];
+              newSelected.pop();
+              return newSelected;
+            });
+            const selectedWithoutLastItem = [...selected];
+            selectedWithoutLastItem.pop();
+            onChange && onChange(selectedWithoutLastItem);
+          }
+        }
+        // This is not a default behaviour of the <input /> field
+        if (e.key === "Escape") {
+          input.blur();
         }
       }
-      // This is not a default behaviour of the <input /> field
-      if (e.key === "Escape") {
-        input.blur();
-      }
-    }
-  }, [selected]);
+    },
+    [selected]
+  );
   const selectables = options.filter(
     (option) => !selected.some((s) => s.value == option.value)
   );
@@ -71,7 +79,7 @@ export function MultiSelect({
       className="overflow-visible bg-transparent"
     >
       <Paragraph className="text-sm mb-1" textColorClassName="text-gray-700">
-        Labels
+        {label}
       </Paragraph>
       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
@@ -111,7 +119,7 @@ export function MultiSelect({
             onValueChange={setInputValue}
             onBlur={() => setOpen(false)}
             onFocus={() => setOpen(true)}
-            placeholder={"Select a label"}
+            placeholder={selected.length === options.length ? "" : placeholder}
             className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
           />
         </div>
