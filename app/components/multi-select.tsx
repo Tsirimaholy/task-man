@@ -81,7 +81,7 @@ export function MultiSelect({
       <Paragraph className="text-sm mb-1" textColorClassName="text-gray-700">
         {label}
       </Paragraph>
-      <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      <div className="group rounded-md border-2 border-dotted px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
           {selected.map((label) => {
             return (
