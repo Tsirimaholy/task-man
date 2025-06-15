@@ -126,20 +126,20 @@ export default function Projects({ loaderData }: Route.ComponentProps) {
     if (navigation.state === "idle" && actionData) {
       if (actionData.success && actionData.message) {
         if (actionData.project) {
-          toast("Project created successfully", {
+          toast["success"]("Project created successfully", {
             description: actionData.message,
           });
         } else if (actionData.updatedProject) {
-          toast("Project updated successfully", {
+          toast["success"]("Project updated successfully", {
             description: actionData.message,
           });
         } else if (actionData.deletedProject) {
-          toast("Project deleted successfully", {
+          toast["success"]("Project deleted successfully", {
             description: actionData.message,
           });
         }
       } else if (actionData.error) {
-        toast("Error", {
+        toast["error"]("Error", {
           description: actionData.error,
         });
       }
