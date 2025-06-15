@@ -76,7 +76,12 @@ export default function Home() {
                       className="text-xs"
                       textColorClassName="text-muted-foreground"
                     >
-                      Last updated x days ago
+                      Last updated{" "}
+                      {new Date().getDay() -
+                        activeProjectData.project.updatedAt.getDay() ||
+                        new Date().getMinutes() -
+                          activeProjectData.project.updatedAt.getMinutes()}{" "}
+                      Minutes ago
                     </Paragraph>
                     <div className="flex -space-x-2">
                       {activeProjectData.project?.members.map((member) => {
@@ -101,53 +106,54 @@ export default function Home() {
                   </>
                 ) : null}
               </div>
-              {activeProjectData &&
-              <Popover
-                onOpenChange={(open) => !open && setCopiedSuccessFully(false)}
-              >
-                <PopoverContent className="flex items-center gap-2">
-                  <Input
-                    id="sharable-link"
-                    defaultValue={
-                      typeof window != "undefined"
-                        ? window.location.toString()
-                        : ""
-                    }
-                    readOnly
-                  />
-                  <Button
-                    variant={"ghost"}
-                    size={"icon"}
-                    onClick={async () => {
-                      const input = document.getElementById(
-                        "sharable-link"
-                      ) as HTMLInputElement;
-                      input.select();
-                      await navigator.clipboard.writeText(input.value);
-                      setCopiedSuccessFully(true);
-                    }}
-                  >
-                    {!copiedSuccessFully ? (
-                      <ClipboardIcon />
-                    ) : (
-                      <ClipboardCheck />
-                    )}
-                  </Button>
-                </PopoverContent>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"secondary"}
-                    size={"sm"}
-                    className="text-sm text-muted-foreground"
-                  >
-                    <Link2Icon
-                      size={15}
-                      className="rotate-[135deg]"
-                    ></Link2Icon>
-                    Share
-                  </Button>
-                </PopoverTrigger>
-              </Popover>}
+              {activeProjectData && (
+                <Popover
+                  onOpenChange={(open) => !open && setCopiedSuccessFully(false)}
+                >
+                  <PopoverContent className="flex items-center gap-2">
+                    <Input
+                      id="sharable-link"
+                      defaultValue={
+                        typeof window != "undefined"
+                          ? window.location.toString()
+                          : ""
+                      }
+                      readOnly
+                    />
+                    <Button
+                      variant={"ghost"}
+                      size={"icon"}
+                      onClick={async () => {
+                        const input = document.getElementById(
+                          "sharable-link"
+                        ) as HTMLInputElement;
+                        input.select();
+                        await navigator.clipboard.writeText(input.value);
+                        setCopiedSuccessFully(true);
+                      }}
+                    >
+                      {!copiedSuccessFully ? (
+                        <ClipboardIcon />
+                      ) : (
+                        <ClipboardCheck />
+                      )}
+                    </Button>
+                  </PopoverContent>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"secondary"}
+                      size={"sm"}
+                      className="text-sm text-muted-foreground"
+                    >
+                      <Link2Icon
+                        size={15}
+                        className="rotate-[135deg]"
+                      ></Link2Icon>
+                      Share
+                    </Button>
+                  </PopoverTrigger>
+                </Popover>
+              )}
             </div>
           </nav>
         </header>
