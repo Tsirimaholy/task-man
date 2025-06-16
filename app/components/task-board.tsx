@@ -1,4 +1,4 @@
-import type { TaskStatus } from "generated/prisma/client";
+import type { Task, TaskStatus } from "generated/prisma/client";
 import { LucidePlus, MoreHorizontal, PlusIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useSubmit } from "react-router";
@@ -45,7 +45,7 @@ export interface ITask {
 }
 type TaskBoardProps = {
   title: string;
-  tasks: ITask[];
+  tasks: Task[];
   onTaskAction?: (taskData: any, intent: string) => void;
   isLoading?: boolean;
   status: TaskStatus;
@@ -80,9 +80,9 @@ export default function TaskBoard({
   };
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
-    const task: ITask = JSON.parse(
+    const task: Task = JSON.parse(
       e.dataTransfer.getData("application/json")
-    ) as ITask;
+    ) as Task;
     updateTaskStatus(task.id.toString(), status);
     setAcceptDrop(false);
   }

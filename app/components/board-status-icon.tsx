@@ -1,3 +1,4 @@
+import type { TaskStatus } from "generated/prisma/client";
 import {
   CheckCircle2,
   Circle,
@@ -8,7 +9,7 @@ import {
 import { forwardRef } from "react";
 
 type BoardStatusIconProps = {
-  status: string;
+  status: TaskStatus;
 } & LucideProps;
 
 const BoardStatusIcon = forwardRef<SVGSVGElement, BoardStatusIconProps>(

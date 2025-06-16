@@ -19,13 +19,14 @@ import { Separator } from "~/components/ui/separator";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { useState, useEffect, useRef } from "react";
-import type { ITask } from "./task-board";
 import BoardStatusIcon from "./board-status-icon";
 import { useFetcher, useLoaderData, useNavigation } from "react-router";
 import { getInitial } from "~/lib/core_utils";
 import { MultiSelect } from "./multi-select";
 import type { loader } from "~/routes/tasks";
 import { useSubmit } from "react-router";
+import type { ITask } from "./task-board";
+
 
 interface TaskCardProps {
   task: ITask;
@@ -36,7 +37,7 @@ export default function TaskCard({ task }: TaskCardProps) {
   const { labels } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const selected = [
-    ...task.labels.map((l) => ({
+    ...task?.labels.map((l) => ({
       color: l.label.color,
       label: l.label.name,
       value: l.label.id.toString(),

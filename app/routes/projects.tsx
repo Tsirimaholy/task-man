@@ -8,9 +8,13 @@ import { Paragraph } from "~/components/typography";
 import SearchInput from "~/components/ui/search-input";
 import { requireIsAuthenticated } from "~/lib/auth";
 import { validateProjectData } from "~/lib/validation";
-import { createProject, deleteProject, getMyProjects, updateProject } from "~/queries/projects";
+import {
+  createProject,
+  deleteProject,
+  getMyProjects,
+  updateProject,
+} from "~/queries/projects";
 import type { Route } from "./+types/projects";
-
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const user = await requireIsAuthenticated(request);
@@ -69,10 +73,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
 
     try {
-      const updatedProject = await updateProject(parseInt(projectId), user!.id, {
-        name: name!.trim(),
-        description: description?.trim() || undefined,
-      });
+      const updatedProject = await updateProject(
+        parseInt(projectId),
+        user!.id,
+        {
+          name: name!.trim(),
+          description: description?.trim() || undefined,
+        }
+      );
 
       return {
         success: true,
@@ -81,7 +89,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       };
     } catch (error) {
       console.error("Error updating project:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to update project. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update project. Please try again.";
       return { error: errorMessage };
     }
   }
@@ -102,7 +113,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       };
     } catch (error) {
       console.error("Error deleting project:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete project. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete project. Please try again.";
       return { error: errorMessage };
     }
   }

@@ -23,14 +23,14 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row }) => {
       return (
         <Button asChild variant={"link"}>
-        <NavLink
-          className="text-wrap"
-          to={href("/projects/:projectId/tasks", {
-            projectId: row.original.id.toString(),
-          })}
-        >
-          {row.getValue("name")}
-        </NavLink>
+          <NavLink
+            className="text-wrap"
+            to={href("/projects/:projectId/tasks", {
+              projectId: row.original.id.toString(),
+            })}
+          >
+            {row.getValue("name")}
+          </NavLink>
         </Button>
       );
     },
@@ -39,11 +39,7 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      return (
-        <div className="text-wrap">
-          {row.getValue("description")}
-        </div>
-      );
+      return <div className="text-wrap">{row.getValue("description")}</div>;
     },
   },
   {
@@ -61,7 +57,7 @@ export const columns: ColumnDef<Project>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const project = row.original;
-      
+
       return (
         <div className="flex items-center gap-2">
           <EditProjectDialog project={project} />

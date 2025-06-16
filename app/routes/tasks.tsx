@@ -1,11 +1,11 @@
 import type { TaskStatus } from "generated/prisma/enums";
 import {
-    Calendar,
-    PlusIcon,
-    Settings2,
-    SortDescIcon,
-    SparklesIcon,
-    X,
+  Calendar,
+  PlusIcon,
+  Settings2,
+  SortDescIcon,
+  SparklesIcon,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { data, useFetcher, useSubmit } from "react-router";
@@ -15,19 +15,21 @@ import { Paragraph } from "~/components/typography";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "~/components/ui/popover";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from "~/components/ui/select";
 import { requireIsAuthenticated } from "~/lib/auth";
 import prisma from "~/lib/prisma";
 import type { Route } from "./+types/tasks";
+import { ORDER } from "~/queries/tasks";
+import type { Task } from "generated/prisma/client";
 
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -218,7 +220,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const labelsInParams = searchParams.getAll("labelsIn");
   const projectId = parseInt(params.projectId);
 
-  let tasks = [];
+  let tasks: Task[] = [];
   const labelIds = labelsInParams
     .map((labelId) => {
       if (labelId) return parseInt(labelId);
@@ -312,6 +314,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         createdAt: "desc",
       },
     });
+    tasks = tasks.sort((a, b) => ORDER[a.priority] - ORDER[b.priority]);
   }
   const project = await prisma.project.findUnique({
     where: { id: projectId },

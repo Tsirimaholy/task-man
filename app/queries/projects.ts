@@ -59,7 +59,9 @@ export async function updateProject(
   });
 
   if (!project) {
-    throw new Error("Project not found or you don't have permission to edit it");
+    throw new Error(
+      "Project not found or you don't have permission to edit it"
+    );
   }
 
   // Update the project
@@ -92,7 +94,9 @@ export async function deleteProject(projectId: number, userId: number) {
   });
 
   if (!project) {
-    throw new Error("Project not found or you don't have permission to delete it");
+    throw new Error(
+      "Project not found or you don't have permission to delete it"
+    );
   }
 
   // Delete the project (cascading deletes will handle related records)
