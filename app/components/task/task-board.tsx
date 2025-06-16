@@ -78,12 +78,15 @@ export default function TaskBoard({
       setIsCreating(true);
     }
   };
-  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+  function handleDropAccept(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
     const task: Task = JSON.parse(
       e.dataTransfer.getData("application/json")
     ) as Task;
-    updateTaskStatus(task.id.toString(), status);
+    // Do not submit if it is dropped on the same board as prev board
+    if (task.status !== status) {
+      updateTaskStatus(task.id.toString(), status);
+    }
     setAcceptDrop(false);
   }
 
@@ -109,7 +112,7 @@ export default function TaskBoard({
         e.preventDefault();
         setAcceptDrop(true);
       }}
-      onDrop={handleDrop}
+      onDrop={handleDropAccept}
       onDragLeave={(e) => {
         e.preventDefault();
         setAcceptDrop(false);
@@ -155,7 +158,7 @@ export default function TaskBoard({
           e.preventDefault();
           setAcceptDrop(true);
         }}
-        onDrop={handleDrop}
+        onDrop={handleDropAccept}
         onDragLeave={() => {
           setAcceptDrop(false);
         }}
