@@ -2,9 +2,9 @@ import type { TaskStatus } from "generated/prisma/client";
 import { Circle } from "lucide-react";
 import { useState } from "react";
 import { useSubmit } from "react-router";
-import { Card, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
+import { Card, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 
 interface EmptyTaskCardProps {
   status: TaskStatus

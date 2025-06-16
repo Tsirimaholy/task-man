@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { data, useFetcher, useSubmit } from "react-router";
 import { MultiSelect } from "~/components/multi-select";
-import TaskBoard from "~/components/task-board";
+import TaskBoard from "~/components/task/task-board";
 import { Paragraph } from "~/components/typography";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";

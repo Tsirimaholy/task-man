@@ -22,11 +22,10 @@ import { useState, useEffect, useRef } from "react";
 import BoardStatusIcon from "./board-status-icon";
 import { useFetcher, useLoaderData, useNavigation } from "react-router";
 import { getInitial } from "~/lib/core_utils";
-import { MultiSelect } from "./multi-select";
+import { MultiSelect } from "~/components/multi-select";
 import type { loader } from "~/routes/tasks";
 import { useSubmit } from "react-router";
 import type { ITask } from "./task-board";
-
 
 interface TaskCardProps {
   task: ITask;

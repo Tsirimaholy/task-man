@@ -5,8 +5,8 @@ import { useSubmit } from "react-router";
 import BoardStatusIcon from "./board-status-icon";
 import EmptyTaskCard from "./empty-task-card";
 import TaskCard from "./task-card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 
 export type TAssignee = {
   id: number;
@@ -18,7 +18,7 @@ export interface ITask {
   id: number;
   title: string;
   description: string | null;
-  status: string;
+  status: TaskStatus;
   priority: string;
   dueDate: Date | null;
   createdAt: Date;
@@ -45,7 +45,7 @@ export interface ITask {
 }
 type TaskBoardProps = {
   title: string;
-  tasks: Task[];
+  tasks: ITask[];
   onTaskAction?: (taskData: any, intent: string) => void;
   isLoading?: boolean;
   status: TaskStatus;
