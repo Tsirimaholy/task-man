@@ -1,5 +1,4 @@
 import { type Header, type Table } from "@tanstack/react-table";
-import type { Project } from "generated/prisma/client";
 
 export const ColumnResizer = ({
   header,
