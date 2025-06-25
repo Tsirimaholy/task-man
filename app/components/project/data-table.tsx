@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { ColumnResizer } from "./column-resizer";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -26,23 +27,30 @@ export function DataTable<TData, TValue>({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
+    columnResizeMode: "onChange",
   });
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="rounded-sm border">
+      <Table style={{ width: table.getCenterTotalSize() }}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => {
             return (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      style={{ width: header.getSize() }}
+                      colSpan={header.colSpan}
+                      className="relative"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                      <ColumnResizer header={header} />
                     </TableHead>
                   );
                 })}
@@ -57,7 +65,14 @@ export function DataTable<TData, TValue>({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => {
                     return (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        style={{
+                          width: cell.column.getSize(),
+                          minWidth: cell.column.columnDef.minSize,
+                        }}
+                        className="border-l"
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

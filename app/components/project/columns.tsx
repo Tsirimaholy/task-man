@@ -24,7 +24,6 @@ export const columns: ColumnDef<Project>[] = [
       return (
         <Button asChild variant={"link"}>
           <NavLink
-            className="text-wrap"
             to={href("/projects/:projectId/tasks", {
               projectId: row.original.id.toString(),
             })}
@@ -38,6 +37,7 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    size: 412,
     cell: ({ row }) => {
       return <div className="text-wrap">{row.getValue("description")}</div>;
     },
