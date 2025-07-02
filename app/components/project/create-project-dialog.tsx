@@ -30,23 +30,25 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
    * how can i know that a action was just triggered
    * Close dialog on successful submission and reset form
    * I nedd a something like
-   * try{setIsSubmiting(true) await fetch() setOpen(false)}catch{ // do something}
+   * try{
+   *  setIsSubmiting(true)
+   *  await triggerAction()
+   *  setOpen(false)
+   * }catch{
+   *  // do something else
+   * }
    **/
-  // useEffect(() => {
-  //   const isSuccess =
-  //     navigation.state === "idle" && !actionData?.error && actionData?.success;
-  //   let timeoutId: NodeJS.Timeout | undefined;
-  //   if (isSuccess && open) {
-  //     setOpen(false);
-  //     // Reset form after a brief delay to allow dialog to close
-  //     timeoutId = setTimeout(() => {
-  //       formRef.current?.reset();
-  //     }, 150);
-  //   }
-  //   return () => {
-  //       return timeoutId && clearTimeout(timeoutId);
-  //   };
-  // }, [navigation.state, actionData, open]);
+  useEffect(() => {
+    const isSuccess =
+      navigation.state === "idle" && !actionData?.error && actionData?.success;
+    if (isSuccess && open) {
+      setOpen(false);
+      // Reset form after a brief delay to allow dialog to close
+      formRef.current?.reset();
+    }
+    return () => {
+    };
+  }, [navigation.state, actionData, open]);
 
   // Reset form when dialog closes
   const handleOpenChange = (newOpen: boolean) => {
@@ -128,7 +130,6 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
             <Button
               type="submit"
               disabled={isSubmitting}
-              onClick={() => handleOpenChange(false)}
             >
               {isSubmitting ? (
                 <>

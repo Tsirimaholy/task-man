@@ -88,6 +88,7 @@ export function MultiSelect({
               <Badge
                 key={label.value}
                 variant="secondary"
+                className={`hover:border-2 hover:border-blue-500 transition-all transition-discrete`}
                 style={{
                   backgroundColor: label.color + "20",
                   color: label.color,
