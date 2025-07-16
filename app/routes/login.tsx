@@ -79,7 +79,7 @@ export default function Loging() {
               placeholder="Enter your email"
               isError={!!data?.errors.email.length}
               errorMessage={
-                !!data?.errors.email.length ? data?.errors.email[0] : undefined
+                data?.errors.email.length ? data?.errors.email[0] : undefined
               }
             />
           </div>
@@ -94,7 +94,7 @@ export default function Loging() {
               placeholder="Enter your password"
               isError={!!data?.errors.password.length}
               errorMessage={
-                !!data?.errors.password.length
+                data?.errors.password.length
                   ? data?.errors.password[0]
                   : undefined
               }
