@@ -10,10 +10,10 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Toaster } from "sonner";
 import { logout } from "./lib/auth";
 import { authCookieStorage } from "./lib/session";
 import proseStyles from "./styles/prose.css?url";
-import { Toaster } from "sonner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
